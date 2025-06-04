@@ -10,6 +10,8 @@ A university project developed using the ATmega32 microcontroller. This project 
 - 🔢 4-digit 7-segment display driven by 7448
 - 🧮 Adjustable threshold and motor speed
 - 🛠️ Written in C using CodeWizardAVR + CodeVisionAVR
+- ✅ Fully simulated in Proteus
+
 
 ## Hardware
 - Microcontroller: ATmega32 (2 MHz)
@@ -30,6 +32,12 @@ A university project developed using the ATmega32 microcontroller. This project 
      - Motor speed
      - Clock settings
 5. Motor speed increases every 15s if temperature exceeds threshold.
+   
+## Files
+
+- `main.c`: Complete source code generated using CodeVisionAVR & customized manually.
+- `image.png`: Proteus schematic of the system.
+- `README.md`: Project documentation for GitHub.
 
 ## Simulation
 Below is the Proteus simulation schematic of the system:
@@ -41,12 +49,11 @@ Below is the Proteus simulation schematic of the system:
 - 7-segment display (MPX4-CC-BL) with 7448 decoder on PORTC.
 - PWM output via Timer2 drives the motor through a transistor.
 
-![Proteus Simulation](image.png)
-
 ## Authors
 - Mostafa Charkazi – [401249015]
 - Meysam Sadeghi – [401249036]
 - Ali Asghar Bararjanpour – [401249008]
 
-## License
-This project is for educational purposes only. No commercial use permitted.
+📌 *Feel free to fork or modify the project for your own embedded system applications.*
+
+![Proteus Simulation](image.png)
