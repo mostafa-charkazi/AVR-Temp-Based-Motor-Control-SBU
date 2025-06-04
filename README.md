@@ -1,5 +1,4 @@
 # AVR Temperature-Based Motor Control System
-
 A university project developed using the ATmega32 microcontroller. This project measures temperature using an LM35 sensor and adjusts the speed of a DC motor accordingly using PWM. It also includes a password-protected menu system, an LCD interface, and a 4-digit 7-segment display.
 
 ## Features
@@ -10,7 +9,7 @@ A university project developed using the ATmega32 microcontroller. This project 
 - ⏰ Internal real-time clock using Timer
 - 🔢 4-digit 7-segment display driven by 7448
 - 🧮 Adjustable threshold and motor speed
-- 🛠️ Written in C using CodeWizardAVR + AVR-GCC
+- 🛠️ Written in C using CodeWizardAVR + CodeVisionAVR
 
 ## Hardware
 - Microcontroller: ATmega32 (2 MHz)
@@ -31,6 +30,18 @@ A university project developed using the ATmega32 microcontroller. This project 
      - Motor speed
      - Clock settings
 5. Motor speed increases every 15s if temperature exceeds threshold.
+
+## Simulation
+Below is the Proteus simulation schematic of the system:
+
+- The ATmega32 is configured with a 2 MHz clock.
+- LCD (20x4) is connected in 4-bit mode via PORTB.
+- LM35 is connected to ADC0 with 2.56V internal reference.
+- Keypad (via 74C922) is interfaced through PORTD.
+- 7-segment display (MPX4-CC-BL) with 7448 decoder on PORTC.
+- PWM output via Timer2 drives the motor through a transistor.
+
+![Proteus Simulation](image.png)
 
 ## Authors
 - Mostafa Charkazi – [401249015]
