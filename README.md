@@ -12,6 +12,15 @@ A university project developed using the ATmega32 microcontroller. This project 
 - 🛠️ Written in C using CodeWizardAVR + CodeVisionAVR
 - ✅ Fully simulated in Proteus
 
+## History & Logging Capabilities
+The system includes a comprehensive history logging feature that tracks:
+- `Login Attempts` Records successful logins and failed attempts with timestamps
+- `Threshold Changes` Logs previous and new temperature threshold values with time
+- `Motor Speed Changes` Records motor speed adjustments with timestamps
+- `Clock Changes` Tracks system time modifications
+- `Accessible via Menu` View history by pressing 'x' or '/' in the main menu
+
+
 
 ## Hardware
 - Microcontroller: ATmega32 (2 MHz)
@@ -23,15 +32,15 @@ A university project developed using the ATmega32 microcontroller. This project 
 - Pushbuttons for interaction
 
 ## How It Works
-1. On boot, project displays student info.
+1. On boot, the project displays student info.
 2. Shows real-time temperature and system clock.
 3. On pressing 'C' key, a login screen appears.
 4. If credentials are correct:
-   - User can access menu to set:
+   - User can access the menu to set:
      - Temperature threshold
      - Motor speed
      - Clock settings
-5. Motor speed increases every 15s if temperature exceeds threshold.
+5. Motor speed increases every 15s if the temperature exceeds the threshold.
    
 ## Files
 
