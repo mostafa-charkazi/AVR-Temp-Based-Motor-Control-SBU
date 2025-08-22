@@ -2,13 +2,13 @@
 This program was created by the
 CodeWizardAVR V3.14 Advanced
 Automatic Program Generator
-© Copyright 1998-2014 Pavel Haiduc, HP InfoTech s.r.l.
+Â© Copyright 1998-2014 Pavel Haiduc, HP InfoTech s.r.l.
 http://www.hpinfotech.com
 
 Project : Micro AVR Course
 Version : 1.0.0
 Date    : 6/3/2025
-Author  : Mostafa Chrakzi
+Author  : Mostafa Charkazi
 Company : SBU
 Comments: Control Motor using temprature sensor (LM32)
 
@@ -32,6 +32,8 @@ Data Stack size         : 512
 
 int i = 0;
 int j = 0;
+int k = 0; // LOG cursor
+
 char str[20];
 int menu = 0;
 float temperature = 0;
@@ -72,6 +74,20 @@ unsigned int digit[4]; // 7-Segment
 char current_digit = 0;
 char segment_on = 0;
 
+int submenu = 0;
+unsigned int hour_not = 0, minute_not = 0, second_not = 0;
+unsigned int hour_login = 0, minute_login = 0, second_login = 0;
+
+unsigned int hour_thre = 2, minute_thre = 12, second_thre = 35;
+int old_thre = 0;
+int new_thre = 0;
+
+unsigned int hour_mot = 2, minute_mot = 12, second_mot = 35;
+int old_mot = 0;
+int new_mot = 0;
+
+unsigned int hour_clock = 2, minute_clock = 12, second_clock = 35;
+int new_clock_hour = 0, new_clock_clock = 0, new_clock_second = 0;
 // Functions
 void init();
 char key_to_char(unsigned char);
@@ -239,8 +255,17 @@ void main(void) {
 			warm_start = -1; mot_speed_current = 0;
 			led = 0;  OCR2 = 0x00;
 		}
-         
-        if (menu == 0){
+        
+        
+        // Menu 0 : Time and degree
+        // Menu 1 : Login Menu
+        // Menu 2 : Main menu
+        // Menu 3 : Threshold
+        // Menu 4 : Mot Speed
+        // Menu 5 : Set Clock
+        // Menu 6 : Logout
+        // Menu 7 : Log ( when x pressed )
+        if (menu == 0) {
             lcd_clear();  
             sprintf(str, "%d.%02d", temp_int, temp_frac);
             lcd_gotoxy(0, 0);
@@ -268,6 +293,7 @@ void main(void) {
                     lcd_gotoxy(0, 3); lcd_puts("NoT : 0           ");
                     menu_shown = 1;
                 }
+                
                 if (last_key == 'C'){
                      menu = 0; menu_shown = 0; last_key = 0;
                 }
@@ -285,6 +311,10 @@ void main(void) {
                             input[0] = 0;
                             stage = 0;
                             if (strcmp(username, correct_user) == 0 && strcmp(password, correct_pass) == 0) {
+                                hour_login = hour;
+                                minute_login = minute;
+                                second_login = second;
+                                
                                 login = 1;
                                 menu = 2;
                                 menu_shown = 0;
@@ -294,6 +324,11 @@ void main(void) {
                                 lcd_gotoxy(0,2); lcd_puts("Pass :           ");
                                 sprintf(str, "NoT : %d        ", tries);
                                 lcd_gotoxy(0, 3); lcd_puts(str);
+                                
+                                // Changing in history
+                                hour_not = hour;
+                                minute_not = minute;
+                                second_not = second;
                             }
                         }
                     }
@@ -344,11 +379,15 @@ void main(void) {
                 lcd_gotoxy(0, 1); lcd_puts("Set MOT . SPD       ");
                 lcd_gotoxy(0, 2); lcd_puts("Set Clock           ");
                 lcd_gotoxy(0, 3); lcd_puts("Logout              ");
+                
                 if (last_key == '+'){
                     i--;
                 }
                 else if (last_key == '-'){
                     i++;
+                }
+                else if (last_key == 'x' || last_key == '/'){
+                    menu = 7; menu_shown = 0; last_key = 0;
                 }
                 else if (last_key == '='){
                     switch(i){
@@ -395,19 +434,29 @@ void main(void) {
                 else if (last_key == '-'){
                     thre_temp -= step;
                 }
-                else if (last_key == '='){
-                     threshold_temperature = thre_temp;
+                else if (last_key == '='){                
+                     // Changing in history
+                     hour_thre = hour;
+                     minute_thre = minute;
+                     second_thre = second;
+                     old_thre = threshold_temperature;
+                     new_thre = thre_temp;
+                     
+                     // Submiting data
+                     threshold_temperature = thre_temp;          
                 }
                 
                 last_key = 0;
             }
             else {
                 lcd_gotoxy(0, 0); lcd_puts("Threshold");
+                
                 sprintf(str, "Temperature: %d", thre_temp);
                 lcd_gotoxy(0, 1); lcd_puts(str);lcd_putchar(0xDF);lcd_puts("C    ");               
             }   
         }
-        else if (menu == 4){  
+        else if (menu == 4){
+            // Mot Speed  
             if (!menu_shown) {
                 temp_mot_speed = mot_speed;
                 lcd_clear();
@@ -422,7 +471,15 @@ void main(void) {
                     menu = 2; menu_shown = 0; last_key = 0;
                 }
                 else if (last_key == '='){
-                    mot_speed = temp_mot_speed; last_key = 0;
+                    // changing history
+                    hour_mot = hour;
+                    minute_mot = minute;
+                    second_mot = second;
+                    old_mot = mot_speed;
+                    new_mot = temp_mot_speed;
+                    
+                    // Submiting data
+                    mot_speed = temp_mot_speed; last_key = 0;                    
                 }
                 else if (last_key == '+' || last_key == '-') {
                     if (last_key == '+'){
@@ -497,10 +554,20 @@ void main(void) {
                     }
                     lcd_gotoxy(0, 2); lcd_puts("                    ");
                 }
-                else if (last_key == '='){
+                else if (last_key == '='){     
+                    // Changing history
+                    hour_clock = hour;
+                    minute_clock = minute;
+                    second_clock = second; 
+                    
+                    new_clock_hour = temp_hour;
+                    new_clock_clock = temp_min;
+                    new_clock_second = temp_sec;
+                    
                     second = temp_sec;
                     minute = temp_min;
                     hour = temp_hour;
+                    
                 }
 
 
@@ -522,6 +589,116 @@ void main(void) {
             login = 0;
             menu = 0;
             menu_shown = 0;         
+            last_key = 0;
+        }
+        else if (menu == 7) {
+            lcd_clear();
+                        
+            // submenu 0: main manu 
+            // submenu 1: Last Login fail
+            // submenu 2: Last Threshold Change
+            // submenu 3: Last motor speed change
+            // submenu 4: Last Clock Change
+            if (submenu == 0){
+                if (last_key == '+'){
+                    k--;
+                    if (k == -1)
+                        k = 3;
+                }
+                else if (last_key == '-'){
+                    k++;
+                    if (k == 4)
+                        k = 0;
+                }
+                else if (last_key == 'x' || last_key == '/'){
+                    menu = 1; menu_shown = 0; last_key = 0; submenu = 0; k = 0; j = 0; i = 0;
+                }
+                
+                lcd_gotoxy(0, 0); lcd_puts("L. Login Fail       ");
+                lcd_gotoxy(0, 1); lcd_puts("L. Threshold Chng   ");
+                lcd_gotoxy(0, 2); lcd_puts("L. Mot Speed Chng   ");
+                lcd_gotoxy(0, 3); lcd_puts("L. Clock Chng       ");
+                lcd_gotoxy(18, k); lcd_puts("<=");
+                
+                if (last_key == '=') {
+                    switch(k){
+                        case 0: submenu = 1; break;
+                        case 1: submenu = 2; break;
+                        case 2: submenu = 3; break;
+                        case 3: submenu = 4; break;
+                    }
+                    lcd_clear();
+                    k = 0;
+                    last_key = 0;
+                }
+                
+                if (last_key == 'x'){
+                    menu = 1; menu_shown = 0; last_key = 0; submenu = 0; k = 0;
+                }
+            }
+            else if (submenu == 1) { 
+                lcd_gotoxy(0, 0); lcd_puts("L. Login           ");
+                
+                sprintf(str, "Last Login = %02d:%02d:%02d", hour_login, minute_login, second_login);
+                lcd_gotoxy(0, 1); lcd_puts(str);
+                
+                sprintf(str, "Last Fail = %02d:%02d:%02d", hour_not, minute_not, second_not);
+                lcd_gotoxy(0, 2); lcd_puts(str);
+                
+                sprintf(str, "Tries Number = %d", tries);
+                lcd_gotoxy(0, 3); lcd_puts(str); 
+                
+                if (last_key == 'C') {
+                    submenu = 0;
+                    k = 0;
+                    last_key = 0;
+                }
+            }
+            else if (submenu == 2) { 
+                lcd_gotoxy(0, 0); lcd_puts("L. Threshold Chng   ");
+                sprintf(str, "Time = %02d:%02d:%02d", hour_thre, minute_thre, second_thre);
+                lcd_gotoxy(0, 1); lcd_puts(str);
+                sprintf(str, "Old Threshold = %d", old_thre);
+                lcd_gotoxy(0, 2); lcd_puts(str);
+                sprintf(str, "New Threshold = %d", new_thre);
+                lcd_gotoxy(0, 3); lcd_puts(str);
+                 
+                
+                if (last_key == 'C') {
+                    submenu = 0;
+                    k = 0;
+                    last_key = 0;
+                }
+            }
+            else if (submenu == 3) { 
+                lcd_gotoxy(0, 0); lcd_puts("L. Mot Speed Chng   ");         
+                sprintf(str, "Time = %02d:%02d:%02d", hour_mot, minute_mot, second_mot);
+                lcd_gotoxy(0, 1); lcd_puts(str);  
+                sprintf(str, "Old Mot. Speed = %d", old_mot);
+                lcd_gotoxy(0, 2); lcd_puts(str);
+                sprintf(str, "New Mot. Speed = %d", new_mot);
+                lcd_gotoxy(0, 3); lcd_puts(str);
+                
+                if (last_key == 'C') {
+                    submenu = 0;
+                    k = 0;
+                    last_key = 0;
+                }
+            }
+            else if (submenu == 4) { 
+                lcd_gotoxy(0, 0); lcd_puts("L. Clock Chng       ");         
+                sprintf(str, "Old Time = %02d:%02d:%02d", hour_clock, minute_clock, second_clock);
+                lcd_gotoxy(0, 1); lcd_puts(str);         
+                sprintf(str, "New Time = %02d:%02d:%02d", new_clock_hour, new_clock_clock, new_clock_second);
+                lcd_gotoxy(0, 2); lcd_puts(str);
+                
+                if (last_key == 'C') {
+                    submenu = 0;
+                    k = 0;
+                    last_key = 0;
+                }            
+            }
+            
             last_key = 0;
         }
     }
